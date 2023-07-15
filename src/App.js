@@ -5,6 +5,11 @@ import { DataContext } from './context/DataContext'
 import { SearchContext } from './context/SearchContext'
 import { BrowserRouter as Router, Routes, Route, Redirect } from 'react-router-dom'
 import HomePage from './components/HomePage.js'
+import ArtistView from './components/ArtistView'
+import AlbumView from './components/AlbumView'
+import { createResource as fetchData } from './helper'
+
+
 
 const App = () => {
   let [search, setSearch] = useState('')
@@ -31,22 +36,32 @@ const App = () => {
     fetchData()
 }
 
-console.log('DATA FROM API!!! app.js', data)
-  return (
-      <div className='App'>
-        <SearchContext.Provider value={{term: searchInput, handleSearch: handleSearch}}>
-          <DataContext.Provider value={data}>
 
-            <Router>
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-              </Routes>
-            </Router>
-            
-          </DataContext.Provider>
-        </SearchContext.Provider>
-      </div>
-  )
+useEffect(() => {
+  if (searchTerm) {
+      setData(fetchData(searchTerm))
+  }
+}, [searchTerm])
+
+
+console.log('DATA FROM API!!! app.js', data)
+return (
+  <div className='App'>
+    <SearchContext.Provider value={{term: searchInput, handleSearch: handleSearch}}>
+      <DataContext.Provider value={data}>
+
+        <Router>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/artist/:id" element={<ArtistView />} />
+            <Route path="/album/:id" element={<AlbumView />} />
+          </Routes>
+        </Router>
+        
+      </DataContext.Provider>
+    </SearchContext.Provider>
+  </div>
+)
 }
 
-export default App
+export default App;
